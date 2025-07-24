@@ -42,7 +42,7 @@ UPDATE_INTERVAL_SECS: int = 3
 # This reactive value is a wrapper around a DEQUE of readings
 # --------------------------------------------
 
-DEQUE_SIZE: int = 5
+DEQUE_SIZE: int = 10
 reactive_value_wrapper = reactive.value(deque(maxlen=DEQUE_SIZE))
 
 # --------------------------------------------
@@ -137,7 +137,21 @@ with ui.layout_columns():
 
         "warmer than usual"
 
-  
+    with ui.value_box(
+        showcase=icon_svg("chart-line"),
+        theme="bg-gradient-green-teal",
+    ):
+        "Summary Stats"
+
+        @render.text
+        def stats_summary():
+            _, df, _ = reactive_calc_combined()
+            if not df.empty:
+                avg = df['temp'].mean()
+                min_temp = df['temp'].min()
+                max_temp = df['temp'].max()
+                return f"Avg: {avg:.2f}°C | Min: {min_temp:.2f}°C | Max: {max_temp:.2f}°C"
+            return "No data yet"  
 
     with ui.card(full_screen=True):
         ui.card_header("Current Date and Time")
